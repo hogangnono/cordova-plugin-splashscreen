@@ -41,9 +41,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.hogangnono.hogangnono.R;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
+import org.apache.cordova.LOG;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -51,7 +54,7 @@ public class SplashScreen extends CordovaPlugin {
     private static final String LOG_TAG = "SplashScreen";
     // Cordova 3.x.x has a copy of this plugin bundled with it (SplashScreenInternal.java).
     // Enable functionality only if running on 4.x.x.
-    private static final boolean HAS_BUILT_IN_SPLASH_SCREEN = Integer.valueOf(CordovaWebView.CORDOVA_VERSION.split("\\.")[0]) < 4;
+    private static final boolean HAS_BUILT_IN_SPLASH_SCREEN = false;//Integer.valueOf(CordovaWebView.CORDOVA_VERSION.split("\\.")[0]) < 4;
     private static final int DEFAULT_SPLASHSCREEN_DURATION = 3000;
     private static final int DEFAULT_FADE_DURATION = 500;
     private static Dialog splashDialog;
@@ -217,12 +220,15 @@ public class SplashScreen extends CordovaPlugin {
     }
 
     private void removeSplashScreen(final boolean forceHideImmediately) {
+        if (HAS_BUILT_IN_SPLASH_SCREEN) {
+            return;
+        }
         cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
         if (splashDialog != null && splashImageView != null && splashDialog.isShowing()) {//check for non-null splashImageView, see https://issues.apache.org/jira/browse/CB-12277
                     final int fadeSplashScreenDuration = getFadeDuration();
                     // CB-10692 If the plugin is being paused/destroyed, skip the fading and hide it immediately
-                    if (fadeSplashScreenDuration > 0 && forceHideImmediately == false) {
+                    if (false){//fadeSplashScreenDuration > 0 && forceHideImmediately == false) {
                         AlphaAnimation fadeOut = new AlphaAnimation(1, 0);
                         fadeOut.setInterpolator(new DecelerateInterpolator());
                         fadeOut.setDuration(fadeSplashScreenDuration);
@@ -265,6 +271,9 @@ public class SplashScreen extends CordovaPlugin {
      */
     @SuppressWarnings("deprecation")
     private void showSplashScreen(final boolean hideAfterDelay) {
+        if (HAS_BUILT_IN_SPLASH_SCREEN) {
+            return;
+        }
         final int splashscreenTime = preferences.getInteger("SplashScreenDelay", DEFAULT_SPLASHSCREEN_DURATION);
         final int drawableId = getSplashId();
 
@@ -302,6 +311,7 @@ public class SplashScreen extends CordovaPlugin {
 
                 // TODO: Use the background color of the webView's parent instead of using the preference.
                 splashImageView.setBackgroundColor(preferences.getInteger("backgroundColor", Color.BLACK));
+//                splashImageView.setBackgroundColor(preferences.getInteger("AndroidWindowSplashScreenBackground", Color.BLACK));
 
                 if (isMaintainAspectRatio()) {
                     // CENTER_CROP scale mode is equivalent to CSS "background-size:cover"
@@ -313,17 +323,35 @@ public class SplashScreen extends CordovaPlugin {
                 }
 
                 // Create and show the dialog
-                splashDialog = new Dialog(context, android.R.style.Theme_Translucent_NoTitleBar);
+                splashDialog = new Dialog(context, R.style.Theme_App_SplashScreen);
                 // check to see if the splash screen should be full screen
                 if ((cordova.getActivity().getWindow().getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN)
                         == WindowManager.LayoutParams.FLAG_FULLSCREEN) {
                     splashDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                             WindowManager.LayoutParams.FLAG_FULLSCREEN);
                 }
+
+//                cordova.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//                cordova.getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+//                final int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+                        //View.SYSTEM_UI_FLAG_FULLSCREEN;
+                          //| View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+//                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+//                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+
+//                splashDialog.getWindow().getDecorView().setSystemUiVisibility(uiOptions);
+
+//                cordova.getActivity().getWindow().setStatusBarColor(Color.parseColor("#584DE4"));
+//                cordova.getActivity().getWindow().setNavigationBarColor(Color.parseColor("#584DE4"));
+//                cordova.getActivity().getWindow().setStatusBarColor(Color.TRANSPARENT);
+//                cordova.getActivity().getWindow().setNavigationBarColor(Color.TRANSPARENT);
+
                 splashDialog.setContentView(splashImageView);
                 splashDialog.setCancelable(false);
                 splashDialog.show();
-
                 if (preferences.getBoolean("ShowSplashScreenSpinner", true)) {
                     spinnerStart();
                 }

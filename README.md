@@ -38,6 +38,7 @@ This plugin displays and hides a splash screen while your web application is lau
 - [Preferences](#preferences)
   - [config.xml](#configxml)
   - [Quirks](#quirks)
+    - [Android Quirks](#android-quirks)
     - [iOS Quirks](#ios-quirks)
 - [Methods](#methods)
   - [splashscreen.hide](#splashscreenhide)
@@ -53,6 +54,7 @@ This plugin displays and hides a splash screen while your web application is lau
 
 ## Supported Platforms
 
+- Android
 - iOS
 
 ## Platform Splash Screen Image Configuration
@@ -80,6 +82,20 @@ projectRoot
 ```
 
 ```xml
+<platform name="android">
+    <!-- you can use any density that exists in the Android project -->
+    <splash src="res/screen/android/splash-land-hdpi.png" density="land-hdpi"/>
+    <splash src="res/screen/android/splash-land-ldpi.png" density="land-ldpi"/>
+    <splash src="res/screen/android/splash-land-mdpi.png" density="land-mdpi"/>
+    <splash src="res/screen/android/splash-land-xhdpi.png" density="land-xhdpi"/>
+    <splash src="res/screen/android/splash-land-xxhdpi.png" density="land-xxhdpi"/>
+
+    <splash src="res/screen/android/splash-port-hdpi.png" density="port-hdpi"/>
+    <splash src="res/screen/android/splash-port-ldpi.png" density="port-ldpi"/>
+    <splash src="res/screen/android/splash-port-mdpi.png" density="port-mdpi"/>
+    <splash src="res/screen/android/splash-port-xhdpi.png" density="port-xhdpi"/>
+    <splash src="res/screen/android/splash-port-xxhdpi.png" density="port-xxhdpi"/>
+</platform>
 
 <platform name="ios">
     <!-- There are two mechanisms for showing launch images.
@@ -379,6 +395,42 @@ The above looks like the following in `config.xml`:
   ```
 
 ### Quirks
+
+#### Android Quirks
+
+In your `config.xml`, you can add the following preferences:
+
+```xml
+<preference name="SplashMaintainAspectRatio" value="true|false" />
+<preference name="SplashShowOnlyFirstTime" value="true|false" />
+<preference name="SplashScreenSpinnerColor" value="white" />
+```
+
+`SplashMaintainAspectRatio` preference is optional. If set to `true`, the splash screen drawable is not stretched to fit the full screen, but instead simply "covers" the screen, like CSS "background-size:cover". This is very useful when splash screen images cannot be distorted in any way, for example when they contain scenery or text. This setting works best with images that have large margins (safe areas) that can be safely cropped on screens with different aspect ratios.
+
+The splash screen plugin reloads the splash screen whenever the orientation changes so that you can specify different splash screen images for portrait and landscape orientations.
+
+`SplashShowOnlyFirstTime` preference is optional and defaults to `true`. When set to `true` the splash screen will only appear on application launch. However, if you plan to use `navigator.app.exitApp()` to close the application and force the splash screen appear on the application's next launch, you should set this property to `false` (this also applies to closing the application with the Back button).
+
+`SplashScreenSpinnerColor` preference is also optional and is ignored when not set. Setting it to a valid color name or HEX color code will change the color of the spinner on Android 5.0+ devices.
+
+#### Browser Quirks
+
+You can use the following preferences in your `config.xml`:
+
+```xml
+<platform name="browser">
+    <preference name="SplashScreen" value="/images/browser/splashscreen.jpg" /> <!-- defaults to "/img/logo.png" -->
+    <preference name="AutoHideSplashScreen" value="true" /> <!-- defaults to "true" -->
+    <preference name="SplashScreenDelay" value="3000" /> <!-- defaults to "3000" -->
+    <preference name="SplashScreenBackgroundColor" value="green" /> <!-- defaults to "#464646" -->
+    <preference name="ShowSplashScreen" value="false" /> <!-- defaults to "true" -->
+    <preference name="SplashScreenWidth" value="600" /> <!-- defaults to "170" -->
+    <preference name="SplashScreenHeight" value="300" /> <!-- defaults to "200" -->
+</platform>
+```
+
+**Note**: `SplashScreen` value should be absolute in order to work in a sub-page. The `SplashScreen` value is used only for the browser platform. The value will be ignored for other platforms.
 
 #### iOS Quirks
 
