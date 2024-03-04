@@ -61,11 +61,9 @@
         <source-file src="src/ios/CDVSplashScreen.m" />
         <header-file src="src/ios/CDVViewController+SplashScreen.h" />
         <source-file src="src/ios/CDVViewController+SplashScreen.m" />
+        <source-file src="src/ios/SplashScreenController.swift" />
+        <resource-file src="src/ios/SplashScreen.storyboard" />
 
 	    <framework src="CoreGraphics.framework" />
-
-        <js-module src="www/splashscreen.js" name="SplashScreen">
-            <clobbers target="navigator.splashscreen" />
-        </js-module>
     </platform>
 </plugin>
