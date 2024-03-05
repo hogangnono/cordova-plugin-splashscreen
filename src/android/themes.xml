@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+	<style name="Theme.Custom.Splash" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/cdv_splashscreen_background</item>
+        <item name="colorPrimaryDark">@color/cdv_splashscreen_background</item>
+        <item name="android:navigationBarColor">@color/cdv_splashscreen_background</item>
+    </style>
+</resources>
