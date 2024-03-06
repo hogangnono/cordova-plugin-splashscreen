@@ -5,4 +5,7 @@
         <item name="colorPrimaryDark">@color/cdv_splashscreen_background</item>
         <item name="android:navigationBarColor">@color/cdv_splashscreen_background</item>
     </style>
+    <style name="Theme.Remove.Splash" parent="@style/Theme.App.SplashScreen">
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 </resources>
