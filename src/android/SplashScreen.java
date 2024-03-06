@@ -206,8 +206,10 @@ public class SplashScreen extends CordovaPlugin {
                         final Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             public void run() {
-                                splashDialog.dismiss();
-                                splashDialog = null;
+                                if (splashDialog != null) {
+                                    splashDialog.dismiss();
+                                    splashDialog = null;
+                                }
                             }
                         }, fadeSplashScreenDuration);
                     } else {
