@@ -18,6 +18,6 @@ class SplashScreenController : UIViewController{
 //        if let image = UIImage(contentsOfFile: imagePath) {
 //            adImageView?.image = image
 //        }
-        adImageView?.image = UIImage(named: "AppIcon")  // for test
+        adImageView?.image = UIImage(named: "ad_test_image")  // for test
     }
 }
