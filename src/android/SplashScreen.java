@@ -174,6 +174,10 @@ public class SplashScreen extends CordovaPlugin {
             } else {
                 this.showSplashScreen(false);
             }
+        } else if ("spinner".equals(id)) {
+            if ("stop".equals(data.toString())) {
+                getView().setVisibility(View.VISIBLE);
+            }
         }
         return null;
     }
