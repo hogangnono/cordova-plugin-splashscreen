@@ -21,6 +21,7 @@
 #import <Cordova/CDVViewController.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
 #import "CDVViewController+SplashScreen.h"
+#import "CDVSplashScreenADLoader.h"
 
 #define kSplashScreenDurationDefault 3000.0f
 #define kFadeDurationDefault 500.0f
@@ -69,6 +70,13 @@
         // that we can safely ignore.
         // Alternatively we can check whether there are observers before calling removeObserver
     }
+}
+
+- (void)settingAd:(CDVInvokedUrlCommand*)command
+{   
+    CDVSplashScreenADLoader *loader = [[CDVSplashScreenADLoader alloc] init];
+    [loader fetchAndStoreSplashScreenImage:self.commandDelegate];
+
 }
 
 - (void)show:(CDVInvokedUrlCommand*)command

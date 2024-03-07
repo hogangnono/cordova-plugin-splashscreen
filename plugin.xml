@@ -68,6 +68,8 @@
         <source-file src="src/ios/CDVViewController+SplashScreen.m" />
         <source-file src="src/ios/SplashScreenController.swift" />
         <resource-file src="src/ios/SplashScreen.storyboard" />
+        <header-file src="src/ios/CDVSplashScreenADLoader.h" />
+        <source-file src="src/ios/CDVSplashScreenADLoader.m" />
 
 	    <framework src="CoreGraphics.framework" />
     </platform>
