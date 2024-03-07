@@ -46,6 +46,7 @@
         </config-file>
 
         <source-file src="src/android/SplashScreen.java" target-dir="src/org/apache/cordova/splashscreen" />
+        <source-file src="src/android/SplashScreenADLoader.java" target-dir="src/org/apache/cordova/splashscreen" />
         <resource-file src="src/android/themes.xml" target="res/values/splash_themes.xml" />
 
         <edit-config file="app/src/main/AndroidManifest.xml" target="/manifest/application/activity[@android:name='MainActivity']" mode="merge">

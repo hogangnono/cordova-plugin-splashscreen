@@ -19,12 +19,16 @@
 
 package org.apache.cordova.splashscreen;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -36,10 +40,18 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.LOG;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
+
 
 public class SplashScreen extends CordovaPlugin {
+    public static final String SHARE_PREFERENCES_NAME = "SplashScreen";
     private static final String LOG_TAG = "SplashScreen";
     private static final boolean HAS_BUILT_IN_SPLASH_SCREEN = false;
     private static final int DEFAULT_SPLASHSCREEN_DURATION = 3000;
@@ -171,8 +183,13 @@ public class SplashScreen extends CordovaPlugin {
         if ("splashscreen".equals(id)) {
             if ("hide".equals(data.toString())) {
                 this.removeSplashScreen(false);
-            } else {
+                this.settingAd();
+            } else if ("show".equals(data.toString())) {
                 this.showSplashScreen(false);
+            } else if ("settingAd".equals(data.toString())) {
+                this.settingAd();
+            } else {
+                return null;
             }
         } else if ("spinner".equals(id)) {
             if ("stop".equals(data.toString())) {
@@ -196,6 +213,11 @@ public class SplashScreen extends CordovaPlugin {
             }
         }
     }
+
+    private void settingAd() {
+        SplashScreenADLoader.initiateDownload(cordova, webView, preferences);
+    }
+
 
     private void removeSplashScreen(final boolean forceHideImmediately) {
         if (HAS_BUILT_IN_SPLASH_SCREEN) {
@@ -291,21 +313,83 @@ public class SplashScreen extends CordovaPlugin {
     private void updateAdImage() {
         ImageView adImageView = splashDialog.findViewById(R.id.ad_image);
         if (adImageView != null) {
-            adImageView.setImageResource(R.drawable.ad_test_image);
-            // download file access code below
-//            File documentsDirectory = cordova.getActivity().getFilesDir();
-//            if (documentsDirectory != null) {
-//                try {
-//                    String imagePath = documentsDirectory.getAbsolutePath() + "/" + SplashScreen.FILE_NAME;
-//                    File file = new File(imagePath);
-//
-//                    if (file.exists()) {
-//                        Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-//                        adImageView.setImageBitmap(bitmap);
-//                    }
-//                } catch (Exception e) {
-//                }
-//            }
+            // 광고 이미지 표시 여부 결정
+            if (shouldDisplaySplashScreenAd()) {
+                loadAndDisplaySplashScreenAdImage();
+            }
+        }
+    }
+
+    /**
+     * 광고 이미지 표시 여부를 결정하는 함수
+     * - SharedPreferences에 저장된 광고 begin과 end를 비교하여 현재 시간이 광고 기간에 속하는지 확인
+     */
+    private boolean shouldDisplaySplashScreenAd() {
+        Context context = webView.getContext();
+        SharedPreferences prefs = context.getSharedPreferences(SHARE_PREFERENCES_NAME, MODE_PRIVATE);
+        String adItemJsonString = prefs.getString("SplashAdItem", null);
+
+        if (adItemJsonString != null) {
+            try {
+                JSONObject adItem = new JSONObject(adItemJsonString);
+                String beginString = adItem.getString("begin");
+                String endString = adItem.getString("end");
+                Log.w(LOG_TAG, "beginString="+beginString);
+                Log.w(LOG_TAG, "endString="+endString);
+
+
+                Log.w(LOG_TAG, "shouldDisplaySplashScreenAd 1" + beginString + "/" + endString);
+
+                Date beginDate = convertUtcStringToDate(beginString);
+                Date endDate = convertUtcStringToDate(endString);
+                Date now = new Date();
+
+                return now.after(beginDate) && now.before(endDate);
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "SplashAdItem JSON 파싱 또는 날짜 에러", e);
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 광고 이미지를 불러와서 표시하는 함수
+     * - SharedPreferences에서 저장된 이미지 파일 경로를 불러와서 이미지를 표시
+     */
+    private void loadAndDisplaySplashScreenAdImage() {
+        Context context = webView.getContext();
+        SharedPreferences prefs = context.getSharedPreferences(SHARE_PREFERENCES_NAME, MODE_PRIVATE);
+        String imagePath = prefs.getString("SplashScreenImageLocalPath", null);
+        ImageView adImageView = splashDialog.findViewById(R.id.ad_image);
+
+        if (adImageView != null && imagePath != null) {
+            try {
+                File file = new File(imagePath);
+                if (file.exists()) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+                    adImageView.setImageBitmap(bitmap);
+                }
+            } catch (Exception e) {
+            }
+
+            Log.d(LOG_TAG, "SplashScreenActivity - imagePath:" + imagePath);
+            // imagePath가 유효한 경로인 경우, 이미지 로딩 라이브러리를 사용하여 표시
+        } else {
+            Log.d(LOG_TAG, "SplashScreenActivity - 광고 이미지를 찾을 수 없거나 경로가 유효하지 않음");
+        }
+    }
+
+
+    private static Date convertUtcStringToDate(String utcString) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        try {
+            return dateFormat.parse(utcString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }
