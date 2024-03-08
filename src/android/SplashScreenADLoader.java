@@ -1,6 +1,7 @@
 package org.apache.cordova.splashscreen;
 
 import org.apache.cordova.*;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -16,92 +17,48 @@ import java.util.concurrent.Executors;
 public class SplashScreenADLoader implements Runnable {
     private static final String LOG_TAG = "SplashScreenADLoader";
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
-    private CordovaPreferences preferences;
     private CordovaWebView webView;
-    private CordovaInterface cordova;
+    private JSONArray args;
 
-    public SplashScreenADLoader(CordovaInterface cordova, CordovaWebView webView, CordovaPreferences preferences) {
+    public SplashScreenADLoader(CordovaWebView webView, JSONArray args) {
         this.webView = webView;
-        this.preferences = preferences;
-        this.cordova = cordova;
+        this.args = args;
     }
 
     @Override
     public void run() {
-        String urlString = preferences.getString("SplashScreenImageUrl", "https://hogangnono.com/api/v2/ads?type=4");
+        Context context = webView.getContext();
         HttpURLConnection connection = null;
         try {
-            URL url = new URL(urlString);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("x-hogangnono-platform", "android");
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(5000);
+            JSONObject options = this.args.getJSONObject(0);
+            String key = options.getString("key");
+            String begin = options.getString("begin");
+            String end = options.getString("end");
+            String imageUrl = options.getString("url"); // 'imageUrl' 대신 'url' 사용
+            String savePath = context.getFilesDir() + "/splashAd.png";
 
-
-            StringBuilder response = new StringBuilder();
-            if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-                    String line;
-                    while ((line = in.readLine()) != null) {
-                        response.append(line);
-                    }
-                }
-
-                JSONObject jsonResponse = new JSONObject(response.toString());
-                JSONObject data = jsonResponse.getJSONObject("data");
-                JSONArray adItems = data.getJSONArray("adItems");
-                JSONObject adItem = adItems.getJSONObject(0);
-
-                Context context = webView.getContext();
-                SharedPreferences sharedPref = context.getSharedPreferences("SplashScreen", Context.MODE_PRIVATE);
-                String savedAdItemString = sharedPref.getString("SplashAdItem", "{}");
-                JSONObject savedAdItem = new JSONObject(savedAdItemString);
-                String localPath = sharedPref.getString("SplashScreenImageLocalPath", "");
-
-                long currentId = adItem.getLong("id");
-                String currentUpdatedAt = adItem.getString("updatedAt");
-                File file = new File(localPath);
-
-                boolean adExists = savedAdItem.has("id") && savedAdItem.getLong("id") == currentId &&
-                                   savedAdItem.has("updatedAt") && savedAdItem.getString("updatedAt").equals(currentUpdatedAt);
-
-                if (adExists && file.exists()) {
-                    Log.d(LOG_TAG, "Splash AD is up-to-date and already exists locally. No download needed.");
-                }else {
-                    String imageDomain = preferences.getString("SplashScreenImageDomain", "https://image.hogangnono.com");
-                    String imageUrl = imageDomain +"/"+ adItem.getJSONObject("image").getString("key");
-                    String savePath = context.getFilesDir() + "/splashAd.png";
-                    downloadImage(imageUrl, savePath);
-
-                    // Update SharedPreferences with new ad item and local path
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString("SplashAdItem", adItem.toString());
-                    editor.putString("SplashScreenImageLocalPath", savePath);
-                    editor.apply();
-
-                    Log.d(LOG_TAG, "New Splash AD downloaded and info updated.");
-                } 
-                
-            } else {
-                throw new IOException("HTTP error code: " + connection.getResponseCode());
-            }
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Error during SplashScreen advertisement handling", e);
-        } finally {
-            if (connection != null) connection.disconnect();
-        }
-    }
-
-    private void downloadImage(String downloadUrl, String savePath) {
-        HttpURLConnection connection = null;
-        try {
-            Log.d(LOG_TAG, "Image Downloaded: " + downloadUrl);
-            URL url = new URL(downloadUrl);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.connect();
+            SharedPreferences sharedPref = context.getSharedPreferences(SplashScreen.SHARE_PREFERENCES_NAME, Context.MODE_PRIVATE);
+            String existingKey = sharedPref.getString("SplashKey", "");
 
             File outputFile = new File(savePath);
+            // 추가된 조건: SplashKey가 동일하고, 파일이 이미 존재하는 경우 다운로드 하지 않음
+            if (key.equals(existingKey) && outputFile.exists()) {
+                Log.d(LOG_TAG, "Image already downloaded and key matches. Skipping download.");
+                return; // 다운로드를 진행하지 않고 메서드 종료
+            }
+
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("SplashKey", key);
+            editor.putString("SplashBegin", begin);
+            editor.putString("SplashEnd", end);
+            editor.apply();
+
+            URL url = new URL(imageUrl);
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(5000);
+            connection.connect();
+
             if (!outputFile.getParentFile().exists()) outputFile.getParentFile().mkdirs();
             if (!outputFile.exists()) outputFile.createNewFile();
 
@@ -111,15 +68,18 @@ public class SplashScreenADLoader implements Runnable {
                 while ((length = is.read(buffer)) != -1) {
                     os.write(buffer, 0, length);
                 }
+                Log.d(LOG_TAG, "Image Downloaded: " + imageUrl);
             }
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, "JSON parsing error: " + e.getMessage(), e);
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Failed to download image"+ e.getMessage());
+            Log.e(LOG_TAG, "Failed to download image: " + e.getMessage(), e);
         } finally {
             if (connection != null) connection.disconnect();
         }
     }
 
-    public static void initiateDownload(CordovaInterface cordova, CordovaWebView webView, CordovaPreferences preferences) {
-        executor.submit(new SplashScreenADLoader(cordova, webView, preferences));
+    public static void initiateDownload(CordovaWebView webView, JSONArray args) {
+        executor.submit(new SplashScreenADLoader(webView, args));
     }
 }

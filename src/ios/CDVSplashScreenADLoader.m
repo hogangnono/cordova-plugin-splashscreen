@@ -1,109 +1,81 @@
-// CDVSplashScreenADLoader.m
 #import <Cordova/CDV.h>
 #import "CDVSplashScreenADLoader.h"
 
 @implementation CDVSplashScreenADLoader
 
-- (void)fetchAndStoreSplashScreenImage:(id<CDVCommandDelegate>)commandDelegate {
-    NSString *imageDomain = [commandDelegate.settings objectForKey:[@"SplashScreenImageDomain" lowercaseString]];
-    NSString *apiURLString = [commandDelegate.settings objectForKey:[@"SplashScreenImageUrl" lowercaseString]];
-    NSURL *apiURL = [NSURL URLWithString:apiURLString];
+- (void)downloadSplashScreenAD:(NSArray *)args {
+    // args 배열의 길이 검사
+    if (args.count < 1) {
+        NSLog(@"[SplashScreen] Error: Expected at least 1 arguments, but received %lu.", (unsigned long)args.count);
+        return;
+    }
     
-    NSLog( @"[RAD] apiURLString:%@", apiURLString );
+    NSDictionary *options = args[0];
+    NSString *key = options[@"key"];
+    NSString *begin = options[@"begin"];
+    NSString *end = options[@"end"];
+    NSString *imageUrl = options[@"url"];
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *previousSplashKey = [defaults objectForKey:@"SplashKey"];
     
-    // HTTP 요청 객체 생성 및 헤더 설정
-   NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:apiURL];
-    [request setValue:@"ios" forHTTPHeaderField:@"x-hogangnono-platform"];
-    
-    // 타임아웃 시간을 5초로 설정
-    request.timeoutInterval = 5.0;
-
-   
+    // 문서 디렉토리 경로 구하기
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *savePath = [documentsDirectory stringByAppendingPathComponent:@"splashAd.png"];
         
-    // API 호출
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
-        if (error) {
-            NSLog(@"Error fetching splash screen image URL: %@", error);
-            return;
-        }
-        
-        NSError *jsonError = nil;
-        NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
-        if (jsonError) {
-            NSLog(@"JSON error: %@", jsonError);
-            return;
-        }
-        
-        NSArray *adItems = responseDict[@"data"][@"adItems"];
-        NSLog( @"[RAD] adItems:%@", adItems );
-       if (adItems && adItems.count > 0) {
-           NSDictionary *firstAdItem = adItems[0]; // 첫 번째 광고 항목 사용
-           
-           // NSUserDefaults에서 이전 광고 항목의 id와 updatedAt 값을 가져옴
-           NSDictionary *previousAdItem = [[NSUserDefaults standardUserDefaults] objectForKey:@"SplashAdItem"];
-           NSString *previousId = [NSString stringWithFormat:@"%@", previousAdItem[@"id"]];
-           NSString *previousUpdateAt = [NSString stringWithFormat:@"%@", previousAdItem[@"updatedAt"]];
-           NSString *previousFilePath = [[NSUserDefaults standardUserDefaults] objectForKey:@"SplashScreenImageLocalPath"];
-           
-           // NSUserDefaults에서 이전 광고 항목의 id와 updatedAt 값을 가져옴
-           NSString *currentId = [NSString stringWithFormat:@"%@", firstAdItem[@"id"]];
-           NSString *currentUpdateAt = [NSString stringWithFormat:@"%@", firstAdItem[@"updatedAt"]];
-
-           
-           // id와 updatedAt 값 모두 변경사항이 없으면 이미지 다운로드 하지 않음
-           if ([currentId isEqualToString:previousId] && [currentUpdateAt isEqualToString:previousUpdateAt] && [self fileExistsAtPath:previousFilePath]) {
-               NSLog(@"[RAD] No update in adItems based on id and updatedAt. Skipping image download.");
-               return;
-           } else {
-               // 변경사항이 있으면 현재 광고 항목을 NSUserDefaults에 저장
-               [[NSUserDefaults standardUserDefaults] setObject:firstAdItem forKey:@"SplashAdItem"];
-               [[NSUserDefaults standardUserDefaults] synchronize];
-               
-               // 이미지 다운로드 진행
-               NSString *key = firstAdItem[@"image"][@"key"];
-               NSString *imageURLString = [NSString stringWithFormat:@"%@/%@", imageDomain , key];
-               NSURL *imageURL = [NSURL URLWithString:imageURLString];
-               [self downloadImage:imageURL];
-           }
-       }
-
-    }];
-    [task resume];
-}
-
-- (void)downloadImage:(NSURL *)imageUrl {
-    NSURLSessionDownloadTask *downloadTask = [[NSURLSession sharedSession] downloadTaskWithURL:imageUrl completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
-        if (error) {
-            NSLog(@"[RAD] Error downloading image: %@", error);
-            return;
-        }
-        
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-        NSURL *cacheDirectory = [fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask].firstObject;
-        NSString *fileName = @"splashAd.png";
-        NSURL *fileURL = [cacheDirectory URLByAppendingPathComponent:fileName];
-        
-        // 기존 파일 삭제
-        if ([fileManager fileExistsAtPath:[fileURL path]]) {
-            [fileManager removeItemAtURL:fileURL error:nil];
-        }
-        
-        NSError *moveError = nil;
-        if ([fileManager moveItemAtURL:location toURL:fileURL error:&moveError]) {
-            NSLog(@"[RAD] Image successfully saved: %@", fileURL);
-            // 파일 경로를 UserDefaults에 저장
-            [[NSUserDefaults standardUserDefaults] setObject:[fileURL path] forKey:@"SplashScreenImageLocalPath"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        } else {
-            NSLog(@"[RAD] Could not save image: %@", moveError);
-        }
-    }];
-    [downloadTask resume];
-}
-
-- (BOOL)fileExistsAtPath:(NSString *)filePath {
+    // 파일 존재 여부 확인
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    return [fileManager fileExistsAtPath:filePath];
+    BOOL isFileExists = [fileManager fileExistsAtPath:savePath];
+    
+    // key가 변경되지 않고  파일이 있으면 이미지를 다운로드 하지 않음
+    if ([previousSplashKey isEqualToString:key] && isFileExists) {
+        NSLog(@"[SplashScreen] The splash screen ad with key %@ is already downloaded and the file exists. Skipping download.", key);
+        return;
+    }
+    
+    
+    // NSURLSessionConfiguration을 사용하여 타임아웃 설정
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    configuration.timeoutIntervalForRequest = 5;
+    configuration.timeoutIntervalForResource = 50;
+    
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
+    NSURL *url = [NSURL URLWithString:imageUrl];
+    NSURLSessionDownloadTask *downloadTask = [session downloadTaskWithURL:url completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
+        if (error) {
+            NSLog(@"[SplashScreen] Error downloading image: %@", error.localizedDescription);
+        } else {
+            NSError *moveError = nil;
+            
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            // 동일한 이름의 파일이 이미 존재하는지 확인
+            if ([fileManager fileExistsAtPath:savePath]) {
+                NSLog(@"[SplashScreen]  existing file: %@", savePath);
+                NSError *fileError;
+                [fileManager removeItemAtPath:savePath error:&fileError];
+                if (fileError) {
+                    NSLog(@"[SplashScreen] Error removing existing file: %@", fileError.localizedDescription);
+                    return;
+                }
+            }
+            
+            // 파일 시스템에 이미지 데이터 저장
+            [fileManager moveItemAtURL:location toURL:[NSURL fileURLWithPath:savePath] error:&moveError];
+            if (moveError) {
+                NSLog(@"[SplashScreen] Error saving image to path: %@, error: %@", savePath, moveError.localizedDescription);
+            } else {
+                NSLog(@"[SplashScreen] Image successfully downloaded and saved to: %@", savePath);
+                // 다운로드가 성공적으로 완료된 후 NSUserDefaults 업데이트
+                [defaults setObject:key forKey:@"SplashKey"];
+                [defaults setObject:begin forKey:@"SplashBegin"];
+                [defaults setObject:end forKey:@"SplashEnd"];
+                [defaults synchronize];
+            }
+        }
+    }];
+    
+    [downloadTask resume];
 }
 
 @end

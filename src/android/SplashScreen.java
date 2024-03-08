@@ -167,6 +167,10 @@ public class SplashScreen extends CordovaPlugin {
                     webView.postMessage("splashscreen", "show");
                 }
             });
+        } else if (action.equals("settingAd")) {
+
+            SplashScreenADLoader.initiateDownload( webView, args);
+
         } else {
             return false;
         }
@@ -183,13 +187,8 @@ public class SplashScreen extends CordovaPlugin {
         if ("splashscreen".equals(id)) {
             if ("hide".equals(data.toString())) {
                 this.removeSplashScreen(false);
-                this.settingAd();
-            } else if ("show".equals(data.toString())) {
-                this.showSplashScreen(false);
-            } else if ("settingAd".equals(data.toString())) {
-                this.settingAd();
             } else {
-                return null;
+                this.showSplashScreen(false);
             }
         } else if ("spinner".equals(id)) {
             if ("stop".equals(data.toString())) {
@@ -212,10 +211,6 @@ public class SplashScreen extends CordovaPlugin {
                 }
             }
         }
-    }
-
-    private void settingAd() {
-        SplashScreenADLoader.initiateDownload(cordova, webView, preferences);
     }
 
 
@@ -327,23 +322,17 @@ public class SplashScreen extends CordovaPlugin {
     private boolean shouldDisplaySplashScreenAd() {
         Context context = webView.getContext();
         SharedPreferences prefs = context.getSharedPreferences(SHARE_PREFERENCES_NAME, MODE_PRIVATE);
-        String adItemJsonString = prefs.getString("SplashAdItem", null);
+        String beginString = prefs.getString("SplashBegin", null);
+        String endString = prefs.getString("SplashEnd", null);
+        Log.w(LOG_TAG, "beginString="+beginString);
+        Log.w(LOG_TAG, "endString="+endString);
 
-        if (adItemJsonString != null) {
+
+        if (beginString != null && endString != null) {
             try {
-                JSONObject adItem = new JSONObject(adItemJsonString);
-                String beginString = adItem.getString("begin");
-                String endString = adItem.getString("end");
-                Log.w(LOG_TAG, "beginString="+beginString);
-                Log.w(LOG_TAG, "endString="+endString);
-
-
-                Log.w(LOG_TAG, "shouldDisplaySplashScreenAd 1" + beginString + "/" + endString);
-
                 Date beginDate = convertUtcStringToDate(beginString);
                 Date endDate = convertUtcStringToDate(endString);
                 Date now = new Date();
-
                 return now.after(beginDate) && now.before(endDate);
             } catch (Exception e) {
                 Log.e(LOG_TAG, "SplashAdItem JSON 파싱 또는 날짜 에러", e);
@@ -360,8 +349,7 @@ public class SplashScreen extends CordovaPlugin {
      */
     private void loadAndDisplaySplashScreenAdImage() {
         Context context = webView.getContext();
-        SharedPreferences prefs = context.getSharedPreferences(SHARE_PREFERENCES_NAME, MODE_PRIVATE);
-        String imagePath = prefs.getString("SplashScreenImageLocalPath", null);
+        String imagePath = context.getFilesDir() + "/splashAd.png";
         ImageView adImageView = splashDialog.findViewById(R.id.ad_image);
 
         if (adImageView != null && imagePath != null) {

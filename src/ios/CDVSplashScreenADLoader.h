@@ -6,7 +6,7 @@
 @interface CDVSplashScreenADLoader : NSObject
 
 
-- (void)fetchAndStoreSplashScreenImage:(id<CDVCommandDelegate>)commandDelegate;
+- (void)downloadSplashScreenAD:(NSArray *)args;
 
 
 @end

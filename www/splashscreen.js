@@ -28,8 +28,8 @@ var splashscreen = {
     hide: function () {
         exec(null, null, 'SplashScreen', 'hide', []);
     },
-    settingAd: function () {
-        exec(null, null, 'SplashScreen', 'settingAd', []);
+    settingAd: function (options = {}) {
+        exec(null, null, 'SplashScreen', 'settingAd', [options]);
     }
 };
 

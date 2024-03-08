@@ -75,7 +75,8 @@
 - (void)settingAd:(CDVInvokedUrlCommand*)command
 {   
     CDVSplashScreenADLoader *loader = [[CDVSplashScreenADLoader alloc] init];
-    [loader fetchAndStoreSplashScreenImage:self.commandDelegate];
+    NSArray *args = command.arguments; // JavaScript에서 전달된 arguments를 받음
+    [loader downloadSplashScreenAD:args];
 
 }
 

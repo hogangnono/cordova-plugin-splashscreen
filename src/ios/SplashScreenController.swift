@@ -26,9 +26,8 @@ class SplashScreenController : UIViewController{
      * - UserDefaults에 저장된 광고 begin과 end을 비교하여 현재 시간이 광고 기간에 속하는지 확인
      */
     private func shouldSplashScreenAd() -> Bool {
-        guard let firstAdItemData = UserDefaults.standard.object(forKey: "SplashAdItem") as? [String: Any],
-              let beginString = firstAdItemData["begin"] as? String,
-              let endString = firstAdItemData["end"] as? String else {return false}
+        guard let beginString = UserDefaults.standard.object(forKey: "SplashBegin") as? String,
+              let endString = UserDefaults.standard.object(forKey: "SplashEnd") as? String  else {return false}
         
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -41,18 +40,23 @@ class SplashScreenController : UIViewController{
     
     /**
     * 광고 이미지를 불러와서 표시하는 함수
-    * - UserDefaults에 저장된 이미지 파일 경로를 불러와서 이미지를 표시
+    * - Documents 경로에 파일을  불러와서 이미지를 표시
     */
     private func loadAndSplashScreenAdImage() {
-        // UserDefaults에서 이미지 파일 경로 불러오기
-        if let imagePath = UserDefaults.standard.string(forKey: "SplashScreenImageLocalPath"),
-           let image = UIImage(contentsOfFile: imagePath) {
-            print("[RAD] SplashScreenController - imagePath:\(imagePath)")
-            self.adImageView.image = image
-        } else {
-            // 파일이 존재하지 않는 경우의 처리
-            print("[RAD] SplashScreenController - No ad image found or invalid path")
+        // Documents 폴더 경로 얻기
+        if let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let imagePath = documentsPath.appendingPathComponent("splashAd.png").path // 파일 경로 조합
+            
+            // UIImage로 이미지 로드 시도
+            if let image = UIImage(contentsOfFile: imagePath) {
+                print("[SplashScreen] SplashScreenController - imagePath:\(imagePath)")
+                self.adImageView.image = image
+            } else {
+                // 파일이 존재하지 않거나 유효하지 않은 경우의 처리
+                print("[SplashScreen] SplashScreenController - No ad image found or invalid path")
+            }
         }
     }
+
 
 }
