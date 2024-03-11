@@ -11,13 +11,15 @@
     }
     
     NSDictionary *options = args[0];
-    NSString *key = options[@"key"];
+    NSString *id = options[@"id"];
+    NSString *updatedAt = options[@"updatedAt"];
     NSString *begin = options[@"begin"];
     NSString *end = options[@"end"];
     NSString *imageUrl = options[@"url"];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *previousSplashKey = [defaults objectForKey:@"SplashKey"];
+    NSString *previousSplashId = [defaults objectForKey:@"SplashId"];
+    NSString *previousUpdatedAt = [defaults objectForKey:@"SplashUpdatedAt"];
     
     // 문서 디렉토리 경로 구하기
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -29,8 +31,8 @@
     BOOL isFileExists = [fileManager fileExistsAtPath:savePath];
     
     // key가 변경되지 않고  파일이 있으면 이미지를 다운로드 하지 않음
-    if ([previousSplashKey isEqualToString:key] && isFileExists) {
-        NSLog(@"[SplashScreen] The splash screen ad with key %@ is already downloaded and the file exists. Skipping download.", key);
+    if (id == previousSplashId &&  [previousUpdatedAt isEqualToString:updatedAt] && isFileExists) {
+        NSLog(@"[SplashScreen] The splash screen ad with id %@ is already downloaded and the file exists. Skipping download.", id);
         return;
     }
     
@@ -67,7 +69,8 @@
             } else {
                 NSLog(@"[SplashScreen] Image successfully downloaded and saved to: %@", savePath);
                 // 다운로드가 성공적으로 완료된 후 NSUserDefaults 업데이트
-                [defaults setObject:key forKey:@"SplashKey"];
+                [defaults setObject:id forKey:@"SplashId"];
+                [defaults setObject:updatedAt forKey:@"SplashUpdatedAt"];
                 [defaults setObject:begin forKey:@"SplashBegin"];
                 [defaults setObject:end forKey:@"SplashEnd"];
                 [defaults synchronize];

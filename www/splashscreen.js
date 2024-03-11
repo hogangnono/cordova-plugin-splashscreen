@@ -30,6 +30,9 @@ var splashscreen = {
     },
     settingAd: function (options = {}) {
         exec(null, null, 'SplashScreen', 'settingAd', [options]);
+    },
+    info: function (success) {
+        exec(success, null, 'SplashScreen', 'info', []);
     }
 };
 

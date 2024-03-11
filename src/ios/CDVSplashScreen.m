@@ -80,6 +80,28 @@
 
 }
 
+- (void)info:(CDVInvokedUrlCommand*)command {
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *id = [defaults objectForKey:@"displayedSplashId"];
+    NSString *isAdDisplayed = [defaults objectForKey:@"isAdDisplayed"];
+    
+    
+    NSMutableDictionary* result = [NSMutableDictionary dictionary];
+    if (id != nil) {
+        [result setObject:id forKey:@"id"];
+    }
+    if (isAdDisplayed != nil) {
+        [result setObject:[NSNumber numberWithBool:isAdDisplayed] forKey:@"isAdDisplayed"];
+    }
+    
+    
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+
 - (void)show:(CDVInvokedUrlCommand*)command
 {
     [self _show];

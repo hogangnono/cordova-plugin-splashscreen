@@ -48,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import org.apache.cordova.PluginResult;
 
 
 public class SplashScreen extends CordovaPlugin {
@@ -59,6 +60,9 @@ public class SplashScreen extends CordovaPlugin {
     private static Dialog splashDialog;
     private static boolean firstShow = true;
     private static boolean lastHideAfterDelay; // https://issues.apache.org/jira/browse/CB-9094
+
+    private boolean isAdDisplayed = false;
+    private int splashScreenAdId = -1;
 
     /**
      * Remember last device orientation to detect orientation changes.
@@ -171,6 +175,19 @@ public class SplashScreen extends CordovaPlugin {
 
             SplashScreenADLoader.initiateDownload( webView, args);
 
+        } else if (action.equals("info")) {            
+            JSONObject result = new JSONObject();
+            try {
+                result.put("id", splashScreenAdId); 
+                result.put("isAdDisplayed", isAdDisplayed); 
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+            return true;
         } else {
             return false;
         }
@@ -324,6 +341,8 @@ public class SplashScreen extends CordovaPlugin {
         SharedPreferences prefs = context.getSharedPreferences(SHARE_PREFERENCES_NAME, MODE_PRIVATE);
         String beginString = prefs.getString("SplashBegin", null);
         String endString = prefs.getString("SplashEnd", null);
+        int id = prefs.getInt("SplashId", -1);
+        splashScreenAdId = id;
         Log.w(LOG_TAG, "beginString="+beginString);
         Log.w(LOG_TAG, "endString="+endString);
 
@@ -358,6 +377,7 @@ public class SplashScreen extends CordovaPlugin {
                 if (file.exists()) {
                     Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
                     adImageView.setImageBitmap(bitmap);
+                    isAdDisplayed = true;
                 }
             } catch (Exception e) {
             }

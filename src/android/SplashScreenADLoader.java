@@ -31,24 +31,27 @@ public class SplashScreenADLoader implements Runnable {
         HttpURLConnection connection = null;
         try {
             JSONObject options = this.args.getJSONObject(0);
-            String key = options.getString("key");
+            int id = options.getInt("id");
+            String updatedAt = options.getString("updatedAt");
             String begin = options.getString("begin");
             String end = options.getString("end");
             String imageUrl = options.getString("url"); // 'imageUrl' 대신 'url' 사용
             String savePath = context.getFilesDir() + "/splashAd.png";
 
             SharedPreferences sharedPref = context.getSharedPreferences(SplashScreen.SHARE_PREFERENCES_NAME, Context.MODE_PRIVATE);
-            String existingKey = sharedPref.getString("SplashKey", "");
+            int previousId = sharedPref.getInt("SplashId", -1);
+            String previousUpdateAt = sharedPref.getString("SplashUpdatedAt", "");
 
             File outputFile = new File(savePath);
-            // 추가된 조건: SplashKey가 동일하고, 파일이 이미 존재하는 경우 다운로드 하지 않음
-            if (key.equals(existingKey) && outputFile.exists()) {
+            // 추가된 조건: SplashId가 동일하고, 파일이 이미 존재하는 경우 다운로드 하지 않음
+            if (id == previousId && updatedAt.equals(previousUpdateAt) && outputFile.exists()) {
                 Log.d(LOG_TAG, "Image already downloaded and key matches. Skipping download.");
                 return; // 다운로드를 진행하지 않고 메서드 종료
             }
 
             SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putString("SplashKey", key);
+            editor.putInt("SplashId", id);
+            editor.putString("SplashUpdatedAt", updatedAt);
             editor.putString("SplashBegin", begin);
             editor.putString("SplashEnd", end);
             editor.apply();
