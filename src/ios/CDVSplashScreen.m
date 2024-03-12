@@ -151,7 +151,8 @@
 
     // [CB-10562] AutoHideSplashScreen may be "true" but we should still be able to hide the splashscreen manually.
     if (!autoHideSplashScreen || force) {
-        effectiveSplashDuration = (fadeDuration) / 1000;
+        // effectiveSplashDuration = (fadeDuration) / 1000;
+        effectiveSplashDuration = 1; // display splash for AD for 1sec
     } else {
         effectiveSplashDuration = (splashDuration - fadeDuration) / 1000;
     }

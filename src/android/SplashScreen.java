@@ -238,9 +238,10 @@ public class SplashScreen extends CordovaPlugin {
         cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 if (splashDialog != null && splashDialog.isShowing()) {//check for non-null splashImageView, see https://issues.apache.org/jira/browse/CB-12277
-                    final int fadeSplashScreenDuration = getFadeDuration();
+                    int fadeSplashScreenDuration = getFadeDuration();
                     // CB-10692 If the plugin is being paused/destroyed, skip the fading and hide it immediately
                     if (fadeSplashScreenDuration > 0 && forceHideImmediately == false) {
+                        fadeSplashScreenDuration = 1000;
                         final Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             public void run() {
