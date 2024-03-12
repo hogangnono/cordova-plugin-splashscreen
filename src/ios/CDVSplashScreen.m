@@ -21,6 +21,7 @@
 #import <Cordova/CDVViewController.h>
 #import <Cordova/CDVScreenOrientationDelegate.h>
 #import "CDVViewController+SplashScreen.h"
+#import "CDVSplashScreenADLoader.h"
 
 #define kSplashScreenDurationDefault 3000.0f
 #define kFadeDurationDefault 500.0f
@@ -70,6 +71,36 @@
         // Alternatively we can check whether there are observers before calling removeObserver
     }
 }
+
+- (void)settingAd:(CDVInvokedUrlCommand*)command
+{   
+    CDVSplashScreenADLoader *loader = [[CDVSplashScreenADLoader alloc] init];
+    NSArray *args = command.arguments; // JavaScript에서 전달된 arguments를 받음
+    [loader downloadSplashScreenAD:args];
+
+}
+
+- (void)info:(CDVInvokedUrlCommand*)command {
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *id = [defaults objectForKey:@"displayedSplashId"];
+    NSString *isAdDisplayed = [defaults objectForKey:@"isAdDisplayed"];
+    
+    
+    NSMutableDictionary* result = [NSMutableDictionary dictionary];
+    if (id != nil) {
+        [result setObject:id forKey:@"id"];
+    }
+    if (isAdDisplayed != nil) {
+        [result setObject:[NSNumber numberWithBool:isAdDisplayed] forKey:@"isAdDisplayed"];
+    }
+    
+    
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 
 - (void)show:(CDVInvokedUrlCommand*)command
 {
