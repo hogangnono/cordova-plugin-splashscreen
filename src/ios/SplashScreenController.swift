@@ -12,7 +12,6 @@ class SplashScreenController : UIViewController{
     @IBOutlet weak var adImageView: UIImageView!
 
     override func viewDidLoad() {
-        print("[RAD] SplashScreenController - viewDidLoad+++")
         super.viewDidLoad()
         
         // 광고 이미지 표시 여부 결정
