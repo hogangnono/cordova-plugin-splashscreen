@@ -23,8 +23,8 @@
 
 ### 5.0.4-hogangnono (Feb 28, 2024)
 
-- restore ios platform
-- set two splash screen for Ads
+- Restore android platform
+- Prepare second splash screen for Ads
 
 ### 5.0.3-hogangnono (Jan 04, 2023)
 
