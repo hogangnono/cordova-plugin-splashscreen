@@ -24,6 +24,7 @@
 #import "CDVSplashScreenADLoader.h"
 
 #define kSplashScreenDurationDefault 3000.0f
+#define kAdsSplashScreenDuration 500.0f
 #define kFadeDurationDefault 500.0f
 
 @implementation CDVSplashScreen
@@ -109,6 +110,7 @@
 
 - (void)_show
 {
+    // [self printWithTime:@"[SplashScreen] show"];
     UIView* parentView = self.viewController.view;
     parentView.userInteractionEnabled = NO;  // disable user interaction while splashscreen is shown
     [parentView addSubview:_splashView];
@@ -122,11 +124,13 @@
 - (void)_hide:(BOOL)force
 {
     id fadeSplashScreenDuration = [self.commandDelegate.settings objectForKey:[@"FadeSplashScreenDuration" lowercaseString]];
-
     float fadeDuration = fadeSplashScreenDuration == nil ? kFadeDurationDefault : [fadeSplashScreenDuration floatValue];
 
     id splashDurationString = [self.commandDelegate.settings objectForKey: [@"SplashScreenDelay" lowercaseString]];
     float splashDuration = splashDurationString == nil ? kSplashScreenDurationDefault : [splashDurationString floatValue];
+    
+    id AdsSplashDurationString = [self.commandDelegate.settings objectForKey: [@"AdsSplashScreenDuration" lowercaseString]];
+    float AdsSplashDuration = AdsSplashDurationString == nil ? kAdsSplashScreenDuration : [AdsSplashDurationString floatValue];
 
     id autoHideSplashScreenValue = [self.commandDelegate.settings objectForKey:[@"AutoHideSplashScreen" lowercaseString]];
     BOOL autoHideSplashScreen = true;
@@ -151,14 +155,13 @@
 
     // [CB-10562] AutoHideSplashScreen may be "true" but we should still be able to hide the splashscreen manually.
     if (!autoHideSplashScreen || force) {
-        // effectiveSplashDuration = (fadeDuration) / 1000;
-        effectiveSplashDuration = 1; // display splash for AD for 1sec
+        effectiveSplashDuration = AdsSplashDuration;
     } else {
-        effectiveSplashDuration = (splashDuration - fadeDuration) / 1000;
+        effectiveSplashDuration = splashDuration - fadeDuration;
     }
     
     __weak __typeof(self) weakSelf = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (uint64_t) effectiveSplashDuration * NSEC_PER_SEC), dispatch_get_main_queue(), CFBridgingRelease(CFBridgingRetain(^(void) {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (uint64_t) effectiveSplashDuration * NSEC_PER_MSEC), dispatch_get_main_queue(), CFBridgingRelease(CFBridgingRetain(^(void) {
         if (!self->_destroyed) {
             [UIView transitionWithView:self.viewController.view
                 duration:(fadeDuration / 1000)
@@ -166,6 +169,7 @@
                 animations:^(void) {
                     // hide
                     if (self->_splashView != nil) {
+                        // [self printWithTime:@"[SplashScreen] hide"];
                         [self->_splashView setAlpha:0];
                     }
                 }
@@ -192,6 +196,20 @@
         // hide
         [self _hide:NO];
     }
+}
+
+- (void)printWithTime:(NSString*)title
+{
+    NSDate *nowGMTDateRaw = [NSDate date];
+    
+    NSDateFormatter *dateFormatterGMT = [[NSDateFormatter alloc] init];
+    [dateFormatterGMT setDateFormat:@"kk:mm:ss.SSS"];
+    NSTimeZone *gmtTimeZone = [NSTimeZone timeZoneWithName:@"GMT"];
+    [dateFormatterGMT setTimeZone:gmtTimeZone];
+    
+    NSString *nowGMTString = @"";
+    nowGMTString = [dateFormatterGMT stringFromDate:nowGMTDateRaw];
+    NSLog(@"%@ - [time : %@]", title, nowGMTString);
 }
 
 @end
