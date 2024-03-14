@@ -56,6 +56,7 @@ public class SplashScreen extends CordovaPlugin {
     private static final String LOG_TAG = "SplashScreen";
     private static final boolean HAS_BUILT_IN_SPLASH_SCREEN = false;
     private static final int DEFAULT_SPLASHSCREEN_DURATION = 3000;
+    private static final int DEFAULT_ADS_DURATION = 500;
     private static final int DEFAULT_FADE_DURATION = 500;
     private static Dialog splashDialog;
     private static boolean firstShow = true;
@@ -238,10 +239,8 @@ public class SplashScreen extends CordovaPlugin {
         cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 if (splashDialog != null && splashDialog.isShowing()) {//check for non-null splashImageView, see https://issues.apache.org/jira/browse/CB-12277
-                    int fadeSplashScreenDuration = getFadeDuration();
-                    // CB-10692 If the plugin is being paused/destroyed, skip the fading and hide it immediately
-                    if (fadeSplashScreenDuration > 0 && forceHideImmediately == false) {
-                        fadeSplashScreenDuration = 1000;
+                    final int adsSplashScreenDuration = preferences.getInteger("AdsSplashScreenDuration", DEFAULT_ADS_DURATION);
+                    if (adsSplashScreenDuration > 0 && forceHideImmediately == false) {
                         final Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             public void run() {
@@ -250,7 +249,7 @@ public class SplashScreen extends CordovaPlugin {
                                     splashDialog = null;
                                 }
                             }
-                        }, fadeSplashScreenDuration);
+                        }, adsSplashScreenDuration);
                     } else {
                         splashDialog.dismiss();
                         splashDialog = null;
