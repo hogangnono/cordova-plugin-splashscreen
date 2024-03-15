@@ -15,12 +15,18 @@ class SplashScreenController : UIViewController{
         super.viewDidLoad()
         
         // 광고 이미지 표시 여부 결정
-         if shouldSplashScreenAd() {
-             loadAndSplashScreenAdImage()
-         }else{
-             UserDefaults.standard.set(false, forKey: "isAdDisplayed")
-         }
-     }
+        if shouldSplashScreenAd() {
+            loadAndSplashScreenAdImage()
+        } else {
+            UserDefaults.standard.set(false, forKey: "isAdDisplayed")
+        }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        resizeAdImageView()
+    }
          
     /**
      * 광고 이미지 표시 여부를 결정하는 함수
@@ -70,5 +76,17 @@ class SplashScreenController : UIViewController{
         }
     }
 
-
+    private func resizeAdImageView() {
+        let isIPhone = (UIDevice.current.userInterfaceIdiom == .phone)
+        let maxWidth = view.frame.size.width
+        if (isIPhone && maxWidth < 360) {  // width 360 미만(iPhone SE) 대응
+            let prevImageCenter = adImageView.center
+            let WIDTH_320 = 320
+            let HEIGHT_320 = 222
+            let HEIGHT_360 = 250
+            adImageView.frame = CGRect(x: 0, y: 0, width: WIDTH_320, height: HEIGHT_320)
+            adImageView.center.x = prevImageCenter.x
+            adImageView.center.y = prevImageCenter.y + CGFloat(((HEIGHT_360 - HEIGHT_320) / 2))
+        }
+    }
 }
