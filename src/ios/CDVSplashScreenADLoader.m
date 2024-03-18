@@ -81,4 +81,32 @@
     [downloadTask resume];
 }
 
+
+- (void)removeplashScreenAD {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    // NSUserDefaults에서 광고 관련 정보 삭제
+    [defaults removeObjectForKey:@"SplashId"];
+    [defaults removeObjectForKey:@"SplashUpdatedAt"];
+    [defaults removeObjectForKey:@"SplashBegin"];
+    [defaults removeObjectForKey:@"SplashEnd"];
+    [defaults synchronize]; // 변경사항 적용
+
+    // 문서 디렉토리 경로 구하기
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *savePath = [documentsDirectory stringByAppendingPathComponent:@"splashAd.png"];
+
+    // 파일 삭제
+    NSFileManager *fileManager = [NSFileManager defaultManager];    
+    if ([fileManager fileExistsAtPath:savePath]) {
+        NSError *error;
+        [fileManager removeItemAtPath:savePath error:&error];
+        if (error) {
+            NSLog(@"[SplashScreen] Error removing ad image: %@", error.localizedDescription);
+        } else {
+            NSLog(@"[SplashScreen] Ad image successfully removed.");
+        }
+    }
+}
+
 @end

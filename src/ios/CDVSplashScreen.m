@@ -81,6 +81,12 @@
 
 }
 
+- (void)removeAd:(CDVInvokedUrlCommand*)command
+{   
+    CDVSplashScreenADLoader *loader = [[CDVSplashScreenADLoader alloc] init];
+    [loader removeplashScreenAD];
+}
+
 - (void)info:(CDVInvokedUrlCommand*)command {
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
