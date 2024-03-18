@@ -7,6 +7,7 @@
 
 
 - (void)downloadSplashScreenAD:(NSArray *)args;
+- (void)removeplashScreenAD;
 
 
 @end

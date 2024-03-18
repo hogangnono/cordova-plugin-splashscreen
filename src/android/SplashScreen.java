@@ -176,6 +176,10 @@ public class SplashScreen extends CordovaPlugin {
 
             SplashScreenADLoader.initiateDownload( webView, args);
 
+        } else if (action.equals("removeAd")) {
+
+            SplashScreenRemoveAd.removeAd( webView);
+
         } else if (action.equals("info")) {            
             JSONObject result = new JSONObject();
             try {

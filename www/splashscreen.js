@@ -31,6 +31,9 @@ var splashscreen = {
     settingAd: function (options = {}) {
         exec(null, null, 'SplashScreen', 'settingAd', [options]);
     },
+    removeAd: function () {
+        exec(null, null, 'SplashScreen', 'removeAd', []);
+    },
     info: function (success) {
         exec(success, null, 'SplashScreen', 'info', []);
     }

@@ -40,5 +40,7 @@ typedef struct {
 
 - (void)show:(CDVInvokedUrlCommand*)command;
 - (void)hide:(CDVInvokedUrlCommand*)command;
+- (void)settingAd:(CDVInvokedUrlCommand*)command;
+- (void)removeAd:(CDVInvokedUrlCommand*)command;
 
 @end
