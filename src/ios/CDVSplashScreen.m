@@ -38,11 +38,6 @@
 
 - (void)createSplashView
 {
-    CGRect webViewBounds = self.viewController.view.bounds;
-    webViewBounds.origin = self.viewController.view.bounds.origin;
-    UIView* view = [[UIView alloc] initWithFrame:webViewBounds];
-    [view setAlpha:0];
-
     NSString* launchStoryboardName = @"SplashScreen";
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:launchStoryboardName bundle:[NSBundle mainBundle]];
     UIViewController* vc = [storyboard instantiateViewControllerWithIdentifier:@"SplashScreenController"];
@@ -74,7 +69,7 @@
 }
 
 - (void)settingAd:(CDVInvokedUrlCommand*)command
-{   
+{
     CDVSplashScreenADLoader *loader = [[CDVSplashScreenADLoader alloc] init];
     NSArray *args = command.arguments; // JavaScript에서 전달된 arguments를 받음
     [loader downloadSplashScreenAD:args];
