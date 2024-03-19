@@ -25,7 +25,7 @@ class SplashScreenController : UIViewController{
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        resizeAdImageView()
+        adjustAdImageView()
     }
          
     /**
@@ -75,18 +75,20 @@ class SplashScreenController : UIViewController{
             }
         }
     }
-
-    private func resizeAdImageView() {
+    
+    /**
+    * safearea 고려하여 image view 위치 조정하는 함수
+    * - safeAreaInsets 값 이용하여 image view의 y값 조정
+    */
+    private func adjustAdImageView() {
         let isIPhone = (UIDevice.current.userInterfaceIdiom == .phone)
-        let maxWidth = view.frame.size.width
-        if (isIPhone && maxWidth < 360) {  // width 360 미만(iPhone SE) 대응
-            let prevImageCenter = adImageView.center
-            let WIDTH_320 = 320
-            let HEIGHT_320 = 222
-            let HEIGHT_360 = 250
-            adImageView.frame = CGRect(x: 0, y: 0, width: WIDTH_320, height: HEIGHT_320)
-            adImageView.center.x = prevImageCenter.x
-            adImageView.center.y = prevImageCenter.y + CGFloat(((HEIGHT_360 - HEIGHT_320) / 2))
+        if let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+            let bottomOfSafeArea = keyWindow.safeAreaInsets.bottom
+            let hasNotch = bottomOfSafeArea > 0
+            if (isIPhone && hasNotch) {
+                print("[SplashScreen] SplashScreenController - adjust Y(-\(bottomOfSafeArea)) value of adImageView")
+                adImageView.center.y = adImageView.center.y - bottomOfSafeArea
+            }
         }
     }
 }
