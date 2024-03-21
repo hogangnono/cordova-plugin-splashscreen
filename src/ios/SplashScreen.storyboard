@@ -21,7 +21,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="430" height="932"/>
                             </imageView>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zGq-OV-pnf">
-                                <rect key="frame" x="35" y="648" width="360" height="250"/>
+                                <rect key="frame" x="35" y="682" width="360" height="250"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="lessThanOrEqual" constant="360" id="53B-5l-SL0"/>
                                     <constraint firstAttribute="width" secondItem="zGq-OV-pnf" secondAttribute="height" multiplier="36:25" id="sEh-bn-MA8"/>
@@ -33,7 +33,7 @@
                         <constraints>
                             <constraint firstItem="UMi-07-9YO" firstAttribute="trailing" secondItem="2ns-9I-Qjs" secondAttribute="trailing" id="FZL-3Z-NFz"/>
                             <constraint firstItem="2ns-9I-Qjs" firstAttribute="bottom" secondItem="Ze5-6b-2t3" secondAttribute="bottom" id="L9l-pw-wXj"/>
-                            <constraint firstItem="UMi-07-9YO" firstAttribute="bottom" secondItem="zGq-OV-pnf" secondAttribute="bottom" id="Xbu-Ns-R54"/>
+                            <constraint firstAttribute="bottom" secondItem="zGq-OV-pnf" secondAttribute="bottom" id="Xbu-Ns-R54"/>
                             <constraint firstItem="zGq-OV-pnf" firstAttribute="centerX" secondItem="2ns-9I-Qjs" secondAttribute="centerX" id="dnF-xF-b8A"/>
                             <constraint firstItem="2ns-9I-Qjs" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="oGN-hc-Uzj"/>
                             <constraint firstItem="2ns-9I-Qjs" firstAttribute="leading" secondItem="UMi-07-9YO" secondAttribute="leading" id="rS9-Wd-zY4"/>

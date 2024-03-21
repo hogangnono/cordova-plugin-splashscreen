@@ -25,7 +25,7 @@ class SplashScreenController : UIViewController{
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        adjustAdImageView()
+//        adjustAdImageView()   // safearea 고려하지 않음
     }
          
     /**
