@@ -81,11 +81,10 @@ class SplashScreenController : UIViewController{
     * - safeAreaInsets 값 이용하여 image view의 y값 조정
     */
     private func adjustAdImageView() {
-        let isIPhone = (UIDevice.current.userInterfaceIdiom == .phone)
         if let keyWindow = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
             let bottomOfSafeArea = keyWindow.safeAreaInsets.bottom
             let hasNotch = bottomOfSafeArea > 0
-            if (isIPhone && hasNotch) {
+            if (hasNotch) {
                 print("[SplashScreen] SplashScreenController - adjust Y(-\(bottomOfSafeArea)) value of adImageView")
                 adImageView.center.y = adImageView.center.y - bottomOfSafeArea
             }
