@@ -20,13 +20,40 @@
 
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
            id="cordova-plugin-splashscreen"
-      version="5.0.3-hogangnono">
+      version="6.0.0-hogangnono">
     <name>Splashscreen</name>
     <description>Cordova Splashscreen Plugin</description>
     <license>Apache 2.0</license>
     <keywords>cordova,splashscreen</keywords>
     <repo>https://git-wip-us.apache.org/repos/asf/cordova-plugin-splashscreen.git</repo>
     <issue>https://issues.apache.org/jira/browse/CB/component/12320653</issue>
+
+    <engines>
+        <engine name="cordova-android" version=">=3.6.0" /><!-- Requires CordovaPlugin.preferences -->
+    </engines>
+
+    <js-module src="www/splashscreen.js" name="SplashScreen">
+        <clobbers target="navigator.splashscreen" />
+    </js-module>
+
+    <!-- android -->
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="SplashScreen">
+                <param name="android-package" value="org.apache.cordova.splashscreen.SplashScreen"/>
+                <param name="onload" value="true"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/SplashScreen.java" target-dir="src/org/apache/cordova/splashscreen" />
+        <source-file src="src/android/SplashScreenADLoader.java" target-dir="src/org/apache/cordova/splashscreen" />
+        <source-file src="src/android/SplashScreenRemoveAd.java" target-dir="src/org/apache/cordova/splashscreen" />
+        <resource-file src="src/android/themes.xml" target="res/values/splash_themes.xml" />
+
+        <config-file file="app/src/main/AndroidManifest.xml" target="/manifest/application/activity[@android:name='MainActivity']" mode="merge">
+            <activity android:theme="@style/Theme.Remove.Splash" />
+        </config-file>
+    </platform>
 
     <!-- ios -->
     <platform name="ios">
@@ -41,11 +68,11 @@
         <source-file src="src/ios/CDVSplashScreen.m" />
         <header-file src="src/ios/CDVViewController+SplashScreen.h" />
         <source-file src="src/ios/CDVViewController+SplashScreen.m" />
+        <source-file src="src/ios/SplashScreenController.swift" />
+        <resource-file src="src/ios/SplashScreen.storyboard" />
+        <header-file src="src/ios/CDVSplashScreenADLoader.h" />
+        <source-file src="src/ios/CDVSplashScreenADLoader.m" />
 
 	    <framework src="CoreGraphics.framework" />
-
-        <js-module src="www/splashscreen.js" name="SplashScreen">
-            <clobbers target="navigator.splashscreen" />
-        </js-module>
     </platform>
 </plugin>

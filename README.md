@@ -30,18 +30,19 @@ description: Control the splash screen for your app.
 
 This plugin displays and hides a splash screen while your web application is launching. Using its methods you can also show and hide the splash screen manually.
 
-- [Installation](#installation)
-- [Supported Platforms](#supported-platforms)
-- [Platform Splash Screen Image Configuration](#platform-splash-screen-image-configuration)
-  - [Example Configuration](#example-configuration)
-  - [iOS-specific Information](#ios-specific-information)
-- [Preferences](#preferences)
-  - [config.xml](#configxml)
-  - [Quirks](#quirks)
-    - [iOS Quirks](#ios-quirks)
-- [Methods](#methods)
-  - [splashscreen.hide](#splashscreenhide)
-  - [splashscreen.show](#splashscreenshow)
+-   [Installation](#installation)
+-   [Supported Platforms](#supported-platforms)
+-   [Platform Splash Screen Image Configuration](#platform-splash-screen-image-configuration)
+    -   [Example Configuration](#example-configuration)
+    -   [iOS-specific Information](#ios-specific-information)
+-   [Preferences](#preferences)
+    -   [config.xml](#configxml)
+    -   [Quirks](#quirks)
+        -   [Android Quirks](#android-quirks)
+        -   [iOS Quirks](#ios-quirks)
+-   [Methods](#methods)
+    -   [splashscreen.hide](#splashscreenhide)
+    -   [splashscreen.show](#splashscreenshow)
 
 ## Installation
 
@@ -53,7 +54,8 @@ This plugin displays and hides a splash screen while your web application is lau
 
 ## Supported Platforms
 
-- iOS
+-   Android
+-   iOS
 
 ## Platform Splash Screen Image Configuration
 
@@ -80,6 +82,20 @@ projectRoot
 ```
 
 ```xml
+<platform name="android">
+    <!-- you can use any density that exists in the Android project -->
+    <splash src="res/screen/android/splash-land-hdpi.png" density="land-hdpi"/>
+    <splash src="res/screen/android/splash-land-ldpi.png" density="land-ldpi"/>
+    <splash src="res/screen/android/splash-land-mdpi.png" density="land-mdpi"/>
+    <splash src="res/screen/android/splash-land-xhdpi.png" density="land-xhdpi"/>
+    <splash src="res/screen/android/splash-land-xxhdpi.png" density="land-xxhdpi"/>
+
+    <splash src="res/screen/android/splash-port-hdpi.png" density="port-hdpi"/>
+    <splash src="res/screen/android/splash-port-ldpi.png" density="port-ldpi"/>
+    <splash src="res/screen/android/splash-port-mdpi.png" density="port-mdpi"/>
+    <splash src="res/screen/android/splash-port-xhdpi.png" density="port-xhdpi"/>
+    <splash src="res/screen/android/splash-port-xxhdpi.png" density="port-xxhdpi"/>
+</platform>
 
 <platform name="ios">
     <!-- There are two mechanisms for showing launch images.
@@ -110,6 +126,9 @@ projectRoot
 </platform>
 
 <preference name="SplashScreenDelay" value="10000" />
+
+<preference name="SplashScreenImageUrl" value="https://dev.hogangnono.com/api/v2/ads?type=4" />
+<preference name="SplashScreenImageDomain" value="https://image.hogangnono.com" />
 ```
 
 ### iOS-specific Information
@@ -161,13 +180,13 @@ Note: It is vitally important that the source image actually matches the size sp
 
 In order to support newer form factors and split-screen/slide-over multitasking, you should use launch storyboard images. These are similar to the legacy launch images above, but there are crucial differences:
 
-- images are not specific to a given device.
+-   images are not specific to a given device.
 
-- images are scaled to fill the available viewport (while maintaining the aspect ratio).
+-   images are scaled to fill the available viewport (while maintaining the aspect ratio).
 
-- the outer edges of the images will be cropped, and the amount will vary based on device an viewport.
+-   the outer edges of the images will be cropped, and the amount will vary based on device an viewport.
 
-- there is no need to provide an image for each possible device, viewport, and orientation; iOS will choose the best image for the situation automatically.
+-   there is no need to provide an image for each possible device, viewport, and orientation; iOS will choose the best image for the situation automatically.
 
 ##### Designing launch storyboard images
 
@@ -175,13 +194,13 @@ The key to designing a launch storyboard image is understanding that the edges o
 
 Instead, the following tips should enable you to create a launch image that works across a multitude of form factors, viewports, and orientations:
 
-- Important graphics (logos, icons, titles) should be centered. The safe bounding region will vary, so you will need to test to ensure that the important graphics are never cropped. Better yet, don't supply any important graphics in the first place.
+-   Important graphics (logos, icons, titles) should be centered. The safe bounding region will vary, so you will need to test to ensure that the important graphics are never cropped. Better yet, don't supply any important graphics in the first place.
 
-  - You _can_ fine-tune the placement and size of these graphics, but you don't have the same fine-grained control as you did with legacy launch images.
+    -   You _can_ fine-tune the placement and size of these graphics, but you don't have the same fine-grained control as you did with legacy launch images.
 
-- Use a simple color wash. If you use two colors, you'll want one color to fill the top half of the image, and the second to fill the bottom half. If you use a gradient, you'll probably want to ensure that the middle of the gradient lines up with the center of the image.
+-   Use a simple color wash. If you use two colors, you'll want one color to fill the top half of the image, and the second to fill the bottom half. If you use a gradient, you'll probably want to ensure that the middle of the gradient lines up with the center of the image.
 
-- Don't worry about pixel perfection -- because the images are scaled, there's almost no chance the images will be perfectly fit to the pixel grid. Since all supported iOS devices use retina screens, users will be hard pressed to notice it anyway.
+-   Don't worry about pixel perfection -- because the images are scaled, there's almost no chance the images will be perfectly fit to the pixel grid. Since all supported iOS devices use retina screens, users will be hard pressed to notice it anyway.
 
 It is important to understand the concept of scale, idiom, and size class traits in order to use launch storyboard images effectively. Of the images supplied to the launch storyboard, iOS will choose the image that best matches the device and viewport and render that image. It is possible to supply only one launch image if so desired, but it is also possible to fine-tune the displayed launch image based on traits. When fine-tuning, one can ignore traits that aren't targeted or supported by the app.
 
@@ -228,11 +247,11 @@ To see the complete list of size classes associated with devices and viewports, 
 
 If your launch image is simple, you may be able to avoid creating a lot of different launch images and supply only one. The launch image needs to meet the following requirements:
 
-- the image should be square
+-   the image should be square
 
-- the image should be large enough to fit on an iPad Pro 12.9": 2732x2732
+-   the image should be large enough to fit on an iPad Pro 12.9": 2732x2732
 
-- anything important should fit within the center
+-   anything important should fit within the center
 
 Keep in mind that the image will be cropped, possibly quite severely, depending upon the viewport.
 
@@ -317,77 +336,113 @@ The above looks like the following in `config.xml`:
 
 ### config.xml
 
-- `AutoHideSplashScreen` (boolean, default to `true`). Indicates whether to hide splash screen automatically or not. The splash screen is hidden after the amount of time specified in the `SplashScreenDelay` preference.
+-   `AutoHideSplashScreen` (boolean, default to `true`). Indicates whether to hide splash screen automatically or not. The splash screen is hidden after the amount of time specified in the `SplashScreenDelay` preference.
 
-  ```xml
-  <preference name="AutoHideSplashScreen" value="true" />
-  ```
+    ```xml
+    <preference name="AutoHideSplashScreen" value="true" />
+    ```
 
-- `SplashScreenDelay` (number, default to 3000). Amount of time in milliseconds to wait before automatically hide splash screen.
+-   `SplashScreenDelay` (number, default to 3000). Amount of time in milliseconds to wait before automatically hide splash screen.
 
-  ```xml
-  <preference name="SplashScreenDelay" value="3000" />
-  ```
+    ```xml
+    <preference name="SplashScreenDelay" value="3000" />
+    ```
 
-  This value used to be in seconds (but is now milliseconds) so values less than 30 will continue to be treated as seconds. (Consider this a deprecated patch that will disapear in some future version.)
+    This value used to be in seconds (but is now milliseconds) so values less than 30 will continue to be treated as seconds. (Consider this a deprecated patch that will disapear in some future version.)
 
-  To disable the splashscreen add the following preference to `config.xml`:
+    To disable the splashscreen add the following preference to `config.xml`:
 
-  ```xml
-  <preference name="SplashScreenDelay" value="0"/>
-  ```
+    ```xml
+    <preference name="SplashScreenDelay" value="0"/>
+    ```
 
-  **iOS Quirk**: to disable the splashscreen on `ios` platform you should also add `<preference name="FadeSplashScreenDuration" value="0"/>` to `config.xml`.
+    **iOS Quirk**: to disable the splashscreen on `ios` platform you should also add `<preference name="FadeSplashScreenDuration" value="0"/>` to `config.xml`.
 
-- `FadeSplashScreen` (boolean, defaults to `true`): Set to `false` to
-  prevent the splash screen from fading in and out when its display
-  state changes.
+-   `FadeSplashScreen` (boolean, defaults to `true`): Set to `false` to
+    prevent the splash screen from fading in and out when its display
+    state changes.
 
-  ```xml
-  <preference name="FadeSplashScreen" value="false"/>
-  ```
+    ```xml
+    <preference name="FadeSplashScreen" value="false"/>
+    ```
 
-- `FadeSplashScreenDuration` (float, defaults to `500`): Specifies the
-  number of milliseconds for the splash screen fade effect to execute.
+-   `FadeSplashScreenDuration` (float, defaults to `500`): Specifies the
+    number of milliseconds for the splash screen fade effect to execute.
 
-  ```xml
-  <preference name="FadeSplashScreenDuration" value="750"/>
-  ```
+    ```xml
+    <preference name="FadeSplashScreenDuration" value="750"/>
+    ```
 
-  _Note_: `FadeSplashScreenDuration` is included into `SplashScreenDelay`, for example if you have `<preference name="SplashScreenDelay" value="3000" />` and `<preference name="FadeSplashScreenDuration" value="1000"/>` defined in `config.xml`:
+    _Note_: `FadeSplashScreenDuration` is included into `SplashScreenDelay`, for example if you have `<preference name="SplashScreenDelay" value="3000" />` and `<preference name="FadeSplashScreenDuration" value="1000"/>` defined in `config.xml`:
 
-  - 00:00 - splashscreen is shown
-  - 00:02 - fading has started
-  - 00:03 - splashscreen is hidden
+    -   00:00 - splashscreen is shown
+    -   00:02 - fading has started
+    -   00:03 - splashscreen is hidden
 
-  Turning the fading off via `<preference name="FadeSplashScreen" value="false"/>` technically means fading duration to be `0` so that in this example the overall splash screen delay will still be 3 seconds.
+    Turning the fading off via `<preference name="FadeSplashScreen" value="false"/>` technically means fading duration to be `0` so that in this example the overall splash screen delay will still be 3 seconds.
 
-  _Note_: This only applies to the application startup - you need to take the fading timeout into account when manually showing/hiding the splash screen in your application's code:
+    _Note_: This only applies to the application startup - you need to take the fading timeout into account when manually showing/hiding the splash screen in your application's code:
 
-  ```javascript
-  navigator.splashscreen.show();
-  window.setTimeout(function () {
-    navigator.splashscreen.hide();
-  }, splashDuration - fadeDuration);
-  ```
+    ```javascript
+    navigator.splashscreen.show();
+    window.setTimeout(function () {
+        navigator.splashscreen.hide();
+    }, splashDuration - fadeDuration);
+    ```
 
-- `ShowSplashScreenSpinner` (boolean, defaults to `true`): Set to `false`
-  to hide the splash screen spinner.
+-   `ShowSplashScreenSpinner` (boolean, defaults to `true`): Set to `false`
+    to hide the splash screen spinner.
 
-  ```xml
-  <preference name="ShowSplashScreenSpinner" value="false"/>
-  ```
+    ```xml
+    <preference name="ShowSplashScreenSpinner" value="false"/>
+    ```
 
 ### Quirks
 
+#### Android Quirks
+
+In your `config.xml`, you can add the following preferences:
+
+```xml
+<preference name="SplashMaintainAspectRatio" value="true|false" />
+<preference name="SplashShowOnlyFirstTime" value="true|false" />
+<preference name="SplashScreenSpinnerColor" value="white" />
+```
+
+`SplashMaintainAspectRatio` preference is optional. If set to `true`, the splash screen drawable is not stretched to fit the full screen, but instead simply "covers" the screen, like CSS "background-size:cover". This is very useful when splash screen images cannot be distorted in any way, for example when they contain scenery or text. This setting works best with images that have large margins (safe areas) that can be safely cropped on screens with different aspect ratios.
+
+The splash screen plugin reloads the splash screen whenever the orientation changes so that you can specify different splash screen images for portrait and landscape orientations.
+
+`SplashShowOnlyFirstTime` preference is optional and defaults to `true`. When set to `true` the splash screen will only appear on application launch. However, if you plan to use `navigator.app.exitApp()` to close the application and force the splash screen appear on the application's next launch, you should set this property to `false` (this also applies to closing the application with the Back button).
+
+`SplashScreenSpinnerColor` preference is also optional and is ignored when not set. Setting it to a valid color name or HEX color code will change the color of the spinner on Android 5.0+ devices.
+
+#### Browser Quirks
+
+You can use the following preferences in your `config.xml`:
+
+```xml
+<platform name="browser">
+    <preference name="SplashScreen" value="/images/browser/splashscreen.jpg" /> <!-- defaults to "/img/logo.png" -->
+    <preference name="AutoHideSplashScreen" value="true" /> <!-- defaults to "true" -->
+    <preference name="SplashScreenDelay" value="3000" /> <!-- defaults to "3000" -->
+    <preference name="SplashScreenBackgroundColor" value="green" /> <!-- defaults to "#464646" -->
+    <preference name="ShowSplashScreen" value="false" /> <!-- defaults to "true" -->
+    <preference name="SplashScreenWidth" value="600" /> <!-- defaults to "170" -->
+    <preference name="SplashScreenHeight" value="300" /> <!-- defaults to "200" -->
+</platform>
+```
+
+**Note**: `SplashScreen` value should be absolute in order to work in a sub-page. The `SplashScreen` value is used only for the browser platform. The value will be ignored for other platforms.
+
 #### iOS Quirks
 
-- In iOS, the splash screen images are called launch images. These images are mandatory on iOS.
+-   In iOS, the splash screen images are called launch images. These images are mandatory on iOS.
 
 ## Methods
 
-- splashscreen.show
-- splashscreen.hide
+-   splashscreen.show
+-   splashscreen.hide
 
 ### splashscreen.hide
 
@@ -405,7 +460,7 @@ timer such as the following in the `deviceready` event handler:
 
 ```js
 setTimeout(function () {
-  navigator.splashscreen.hide();
+    navigator.splashscreen.hide();
 }, 2000);
 ```
 
