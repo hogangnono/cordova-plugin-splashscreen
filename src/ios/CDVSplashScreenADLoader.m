@@ -89,6 +89,10 @@
     [defaults removeObjectForKey:@"SplashUpdatedAt"];
     [defaults removeObjectForKey:@"SplashBegin"];
     [defaults removeObjectForKey:@"SplashEnd"];
+
+    [defaults removeObjectForKey:@"displayedSplashId"];
+    [defaults removeObjectForKey:@"isAdDisplayed"];    
+    
     [defaults synchronize]; // 변경사항 적용
 
     // 문서 디렉토리 경로 구하기
