@@ -94,7 +94,8 @@
         [result setObject:id forKey:@"id"];
     }
     if (isAdDisplayed != nil) {
-        [result setObject:[NSNumber numberWithBool:isAdDisplayed] forKey:@"isAdDisplayed"];
+        BOOL isAdDisplayedBool = [isAdDisplayed boolValue];  // NSString을 BOOL로 변환
+        [result setObject:[NSNumber numberWithBool:isAdDisplayedBool] forKey:@"isAdDisplayed"];
     }
     
     
