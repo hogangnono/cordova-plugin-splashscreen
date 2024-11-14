@@ -56,7 +56,6 @@ public class SplashScreen extends CordovaPlugin {
     private static final String LOG_TAG = "SplashScreen";
     private static final boolean HAS_BUILT_IN_SPLASH_SCREEN = false;
     private static final int DEFAULT_SPLASHSCREEN_DURATION = 3000;
-    private static final int DEFAULT_ADS_DURATION = 500;
     private static final int DEFAULT_FADE_DURATION = 500;
     private static Dialog splashDialog;
     private static boolean firstShow = true;
@@ -243,8 +242,10 @@ public class SplashScreen extends CordovaPlugin {
         cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 if (splashDialog != null && splashDialog.isShowing()) {//check for non-null splashImageView, see https://issues.apache.org/jira/browse/CB-12277
-                    final int adsSplashScreenDuration = preferences.getInteger("AdsSplashScreenDuration", DEFAULT_ADS_DURATION);
-                    if (adsSplashScreenDuration > 0 && forceHideImmediately == false) {
+                    Context context = webView.getContext();
+                    SharedPreferences prefs = context.getSharedPreferences(SHARE_PREFERENCES_NAME, MODE_PRIVATE);
+                    final int delayTime = prefs.getInt("SplashDelayTime", 0);
+                    if (delayTime > 0 && forceHideImmediately == false) {
                         final Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             public void run() {
@@ -253,7 +254,7 @@ public class SplashScreen extends CordovaPlugin {
                                     splashDialog = null;
                                 }
                             }
-                        }, adsSplashScreenDuration);
+                        }, delayTime);
                     } else {
                         splashDialog.dismiss();
                         splashDialog = null;
@@ -317,7 +318,7 @@ public class SplashScreen extends CordovaPlugin {
                     handler.postDelayed(new Runnable() {
                         public void run() {
                             if (lastHideAfterDelay) {
-                                removeSplashScreen(false);
+                                removeSplashScreen(true);
                             }
                         }
                     }, effectiveSplashDuration);

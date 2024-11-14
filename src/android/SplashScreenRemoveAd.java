@@ -44,7 +44,7 @@ public class SplashScreenRemoveAd implements Runnable {
         editor.remove("SplashUpdatedAt");
         editor.remove("SplashBegin");
         editor.remove("SplashEnd");
-        
+        editor.remove("SplashDelayTime");
         // 변경사항 적용
         editor.apply();
         

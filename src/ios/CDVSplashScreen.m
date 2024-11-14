@@ -24,7 +24,6 @@
 #import "CDVSplashScreenADLoader.h"
 
 #define kSplashScreenDurationDefault 3000.0f
-#define kAdsSplashScreenDuration 500.0f
 #define kFadeDurationDefault 500.0f
 
 @implementation CDVSplashScreen
@@ -125,14 +124,16 @@
 
 - (void)_hide:(BOOL)force
 {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSNumber *delayTime = [defaults objectForKey:@"SplashDelayTime"];
+
     id fadeSplashScreenDuration = [self.commandDelegate.settings objectForKey:[@"FadeSplashScreenDuration" lowercaseString]];
     float fadeDuration = fadeSplashScreenDuration == nil ? kFadeDurationDefault : [fadeSplashScreenDuration floatValue];
 
     id splashDurationString = [self.commandDelegate.settings objectForKey: [@"SplashScreenDelay" lowercaseString]];
     float splashDuration = splashDurationString == nil ? kSplashScreenDurationDefault : [splashDurationString floatValue];
     
-    id AdsSplashDurationString = [self.commandDelegate.settings objectForKey: [@"AdsSplashScreenDuration" lowercaseString]];
-    float AdsSplashDuration = AdsSplashDurationString == nil ? kAdsSplashScreenDuration : [AdsSplashDurationString floatValue];
+    float splashDelayTime = delayTime == nil ? 0 : [delayTime floatValue];
 
     id autoHideSplashScreenValue = [self.commandDelegate.settings objectForKey:[@"AutoHideSplashScreen" lowercaseString]];
     BOOL autoHideSplashScreen = true;
@@ -157,7 +158,7 @@
 
     // [CB-10562] AutoHideSplashScreen may be "true" but we should still be able to hide the splashscreen manually.
     if (!autoHideSplashScreen || force) {
-        effectiveSplashDuration = AdsSplashDuration;
+        effectiveSplashDuration = splashDelayTime;
     } else {
         effectiveSplashDuration = splashDuration - fadeDuration;
     }

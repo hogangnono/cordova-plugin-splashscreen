@@ -16,6 +16,7 @@
     NSString *begin = options[@"begin"];
     NSString *end = options[@"end"];
     NSString *imageUrl = options[@"url"];
+    NSNumber *delayTime = options[@"delayTime"];
 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *previousSplashId = [defaults objectForKey:@"SplashId"];
@@ -73,6 +74,7 @@
                 [defaults setObject:updatedAt forKey:@"SplashUpdatedAt"];
                 [defaults setObject:begin forKey:@"SplashBegin"];
                 [defaults setObject:end forKey:@"SplashEnd"];
+                [defaults setObject:delayTime forKey:@"SplashDelayTime"];
                 [defaults synchronize];
             }
         }
@@ -89,6 +91,7 @@
     [defaults removeObjectForKey:@"SplashUpdatedAt"];
     [defaults removeObjectForKey:@"SplashBegin"];
     [defaults removeObjectForKey:@"SplashEnd"];
+    [defaults removeObjectForKey:@"SplashDelayTime"];
 
     [defaults removeObjectForKey:@"displayedSplashId"];
     [defaults removeObjectForKey:@"isAdDisplayed"];    

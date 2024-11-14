@@ -37,6 +37,7 @@ public class SplashScreenADLoader implements Runnable {
             String end = options.getString("end");
             String imageUrl = options.getString("url"); // 'imageUrl' 대신 'url' 사용
             String savePath = context.getFilesDir() + "/splashAd.png";
+            int delayTime = options.getInt("delayTime");
 
             SharedPreferences sharedPref = context.getSharedPreferences(SplashScreen.SHARE_PREFERENCES_NAME, Context.MODE_PRIVATE);
             int previousId = sharedPref.getInt("SplashId", -1);
@@ -54,6 +55,7 @@ public class SplashScreenADLoader implements Runnable {
             editor.putString("SplashUpdatedAt", updatedAt);
             editor.putString("SplashBegin", begin);
             editor.putString("SplashEnd", end);
+            editor.putInt("SplashDelayTime", delayTime);
             editor.apply();
 
             URL url = new URL(imageUrl);
