@@ -1,5 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+    <style name="Theme.App.SplashBackground" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@color/cdv_splashscreen_background</item>
+    </style>
 	<style name="Theme.Custom.Splash" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/cdv_splashscreen_background</item>
         <item name="colorPrimaryDark">@color/cdv_splashscreen_background</item>
@@ -7,5 +10,6 @@
     </style>
     <style name="Theme.Remove.Splash" parent="@style/Theme.App.SplashScreen">
         <item name="android:windowIsTranslucent">true</item>
+        <item name="postSplashScreenTheme">@style/Theme.App.SplashBackground</item>
     </style>
 </resources>
